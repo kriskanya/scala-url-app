@@ -59,12 +59,12 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
 
       try {
         val res = scala.io.Source.fromURL(data.url)("ISO-8859-1").mkString
-        val pattern = "(?<=<title>)(.*?)(?=</title>)".r 
+        val pattern = "(?<=<title[^>]*>)(.*?)(?=</title>)".r 
         val match1 = pattern.findFirstIn(res)
         val s = match1.map(_.toString).getOrElse("")
 
         if(s == "") {
-          Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Title is empty. Consider adding http or https.")
+          Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "<title> is empty. Consider adding http or https.")
         } else {
           val widget = Widget(url = s)
           widgets.append(widget)
@@ -73,7 +73,6 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
       } catch {
         case e: Exception => Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Some error occurred.")
       }
-      
     }
 
     val formValidationResult = form.bindFromRequest
