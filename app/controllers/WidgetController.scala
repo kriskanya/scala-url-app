@@ -39,6 +39,11 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
     Ok(views.html.listWidgets(widgets, form, postUrl))
   }
 
+  def clearList = Action { implicit request: MessagesRequest[AnyContent] =>
+    widgets.clear()
+    Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "List cleared")
+  }
+
   // This will be the action that handles our form post
   def createWidget = Action { implicit request: MessagesRequest[AnyContent] =>
     val errorFunction = { formWithErrors: Form[Data] =>
@@ -50,19 +55,25 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: Data =>
       // This is the good case, where the form was successfully parsed as a Data object.
-      // val widget = Widget(name = data.name)
-      val res = scala.io.Source.fromURL(data.url)("ISO-8859-1").mkString
-      val pattern = "(?<=<title>)(.*?)(?=</title>)".r 
-      val match1 = pattern.findFirstIn(res)
-      val s = match1.map(_.toString).getOrElse("")
+      // http://docs.sequelizejs.com
 
-      if(s == "") {
-        Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Title is empty. Consider adding http or https")
-      } else {
-        val widget = Widget(url = s)
-        widgets.append(widget)
-        Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Site title added!")
+      try {
+        val res = scala.io.Source.fromURL(data.url)("ISO-8859-1").mkString
+        val pattern = "(?<=<title>)(.*?)(?=</title>)".r 
+        val match1 = pattern.findFirstIn(res)
+        val s = match1.map(_.toString).getOrElse("")
+
+        if(s == "") {
+          Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Title is empty. Consider adding http or https.")
+        } else {
+          val widget = Widget(url = s)
+          widgets.append(widget)
+          Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Site title added!")
+        }
+      } catch {
+        case e: Exception => Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Some error occurred.")
       }
+      
     }
 
     val formValidationResult = form.bindFromRequest

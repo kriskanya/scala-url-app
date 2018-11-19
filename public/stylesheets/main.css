@@ -1,0 +1,21 @@
+body {
+    font-family: 'Helvetica Neue', Roboto, 'Helvetica', sans-serif;
+}
+
+h1 {
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+dl#url_field {
+    margin-top: 5em;
+}
+
+label {
+    display: none;
+}
+
+input.form-control {
+    width: 40%;
+    margin-top: 0 !important;
+}

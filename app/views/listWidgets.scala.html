@@ -2,16 +2,16 @@
 
   @main("Widgets") {
 
-    <h1>Site titles</h1>
-
     @* Flash shows updates to a page *@
     @request.flash.data.map{ case (name, value) =>
-      <div>@name: @value</div>
+      <div class="alert alert-primary" role="alert">@value</div>
     }
 
-    <table>
+    <h1 class="mt-5">Site titles</h1>
+
+    <table class="table table-striped mt-5">
       <thead>
-        <tr><th>Title</th>
+        <tr><th scope="col">Title(s)</th>
       </thead>
       <tbody>
       @for(w <- widgets) {
@@ -19,8 +19,6 @@
       }
       </tbody>
     </table>
-
-    <hr/>
 
     @* Global errors are not tied to any particular form field *@
     @if(form.hasGlobalErrors) {
@@ -34,8 +32,11 @@
     @helper.form(postUrl) {
       @helper.CSRF.formField
 
-      @helper.inputText(form("url"))
+      @helper.inputText(form("url"), 'class -> "form-control", 'placeholder -> "Enter url to fetch site title")
 
-      <button>Retrieve title for url</button>
+      <button type="submit" class="btn btn-primary">Retrieve title for url</button>
+      <a href="@controllers.routes.WidgetController.clearList">
+        <button type="button" class="btn btn-secondary">Clear List</button>
+      </a>
     }
   }

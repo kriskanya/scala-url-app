@@ -7,6 +7,7 @@ GET     /                           controllers.WidgetController.index
 
 # Widgets
 GET     /widgets                    controllers.WidgetController.listWidgets
+GET     /clear-widgets              controllers.WidgetController.clearList
 POST    /widgets                    controllers.WidgetController.createWidget
 
 # Map static resources from the /public folder to the /assets URL path
