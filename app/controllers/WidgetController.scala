@@ -7,6 +7,9 @@ import play.api.data._
 import play.api.i18n._
 import play.api.mvc._
 
+import scala.io.Source
+import scala.collection.mutable.ArrayBuffer
+
 /**
  * The classic WidgetController using MessagesAbstractController.
  *
@@ -20,11 +23,7 @@ import play.api.mvc._
 class WidgetController @Inject()(cc: MessagesControllerComponents) extends MessagesAbstractController(cc) {
   import WidgetForm._
 
-  private val widgets = scala.collection.mutable.ArrayBuffer(
-    Widget("Widget 1", 123),
-    Widget("Widget 2", 456),
-    Widget("Widget 3", 789)
-  )
+  private val widgets = ArrayBuffer[Widget]()
 
   // The URL to the widget.  You can call this directly from the template, but it
   // can be more convenient to leave the template completely stateless i.e. all
@@ -51,9 +50,19 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
 
     val successFunction = { data: Data =>
       // This is the good case, where the form was successfully parsed as a Data object.
-      val widget = Widget(name = data.name, price = data.price)
-      widgets.append(widget)
-      Redirect(routes.WidgetController.listWidgets()).flashing("info" -> "Widget added!")
+      // val widget = Widget(name = data.name)
+      val res = scala.io.Source.fromURL(data.url)("ISO-8859-1").mkString
+      val pattern = "(?<=<title>)(.*?)(?=</title>)".r 
+      val match1 = pattern.findFirstIn(res)
+      val s = match1.map(_.toString).getOrElse("")
+
+      if(s == "") {
+        Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Title is empty. Consider adding http or https")
+      } else {
+        val widget = Widget(url = s)
+        widgets.append(widget)
+        Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "Site title added!")
+      }
     }
 
     val formValidationResult = form.bindFromRequest

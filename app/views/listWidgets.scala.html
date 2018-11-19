@@ -2,7 +2,7 @@
 
   @main("Widgets") {
 
-    <h1>Widgets</h1>
+    <h1>Site titles</h1>
 
     @* Flash shows updates to a page *@
     @request.flash.data.map{ case (name, value) =>
@@ -11,11 +11,11 @@
 
     <table>
       <thead>
-        <tr><th>Name</th><th>Price</th>
+        <tr><th>Title</th>
       </thead>
       <tbody>
       @for(w <- widgets) {
-        <tr><td>@w.name</td><td>@w.price</td></tr>
+        <tr><td>@w.url</td></tr>
       }
       </tbody>
     </table>
@@ -34,10 +34,8 @@
     @helper.form(postUrl) {
       @helper.CSRF.formField
 
-      @helper.inputText(form("name"))
+      @helper.inputText(form("url"))
 
-      @helper.inputText(form("price"))
-
-      <button>Create widget</button>
+      <button>Retrieve title for url</button>
     }
   }
