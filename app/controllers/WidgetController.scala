@@ -10,6 +10,9 @@ import play.api.mvc._
 import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
 
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+
 /**
  * The classic WidgetController using MessagesAbstractController.
  *
@@ -54,14 +57,9 @@ class WidgetController @Inject()(cc: MessagesControllerComponents) extends Messa
     }
 
     val successFunction = { data: Data =>
-      // This is the good case, where the form was successfully parsed as a Data object.
-      // http://docs.sequelizejs.com
-
       try {
         val res = scala.io.Source.fromURL(data.url)("ISO-8859-1").mkString
-        val pattern = "(?<=<title[^>]*>)(.*?)(?=</title>)".r 
-        val match1 = pattern.findFirstIn(res)
-        val s = match1.map(_.toString).getOrElse("")
+        val s = Jsoup.parse(res).title
 
         if(s == "") {
           Redirect(routes.WidgetController.listWidgets()).flashing("alert" -> "<title> is empty. Consider adding http or https.")
