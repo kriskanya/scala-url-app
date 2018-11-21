@@ -1,1 +1,1 @@
-web: target/universal/stage/bin/scala-url-app -Dhttp.port=${PORT}
+web: target/universal/stage/bin/scala-url-app -Dhttp.port=9000
